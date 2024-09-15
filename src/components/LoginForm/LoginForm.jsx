@@ -1,8 +1,12 @@
 import imagenes from "../../assets/imagenes";
 
+
 const LoginForm = () => {
     return (
-        <div className="flex justify-center items-center h-screen bg-[url('/src/assets/bg.jpg')] bg-cover">
+        <div className="bg-login-bg bg-cover">
+
+        
+        <div className="flex justify-center items-center h-screen">
             <div className="bg-perl bg-opacity-90 p-8 rounded-lg">
                 <form className="flex flex-col items-center">
                     <div className="flex items-stretch mb-16">
@@ -46,6 +50,8 @@ const LoginForm = () => {
                     </div>
                 </form>
             </div>
+        </div>
+
         </div>
     );
 }
