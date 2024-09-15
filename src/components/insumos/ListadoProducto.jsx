@@ -29,14 +29,12 @@ const ListadoProducto = () => {
             <div className='text-center mb-6'>
                 <h3 className='text-lg font-bold'>Insumos</h3>
                 <div className='container ml-64'>
-                    <a>
                         <Link
                             className="bg-green hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg ml-80"
                             to="/agregar"
                         >
                             Agregar Insumo
                         </Link>
-                    </a>
                 </div>
             </div>
             <div className='overflow-x-auto ml-56'>
