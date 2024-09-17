@@ -16,6 +16,7 @@ const ListadoProducto = () => {
     const cargarProductos = async () => {
         const resultado = await axios.get(urlBase);
         console.log("Resultado cargar productos");
+        console.log(resultado.data)
         setProducto(resultado.data);
     }
 
@@ -23,6 +24,14 @@ const ListadoProducto = () => {
         await axios.delete(`${urlBase}/${idProduct}`);
         cargarProductos();
     }
+
+    const formatearFecha = (fecha) => {
+        const date = new Date(fecha);
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    };
 
     return (
         <div className='container mx-72 my-72 text-sm'>
@@ -55,7 +64,7 @@ const ListadoProducto = () => {
                         {producto.map((producto, indice) => (
                             <tr key={indice} className="hover:bg-gray-100">
                                 <td className='py-2 px-4 border-b'>{producto.idProduct}</td>
-                                <td className='py-2 px-4 border-b'>{producto.inDate}</td>
+                                <td className='py-2 px-4 border-b'>{formatearFecha(producto.inDate)}</td>
                                 <td className='py-2 px-4 border-b'>{producto.name}</td>
                                 <td className='py-2 px-4 border-b'>{producto.type}</td>
                                 <td className='py-2 px-4 border-b'>{producto.presentation}</td>
