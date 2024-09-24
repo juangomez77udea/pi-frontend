@@ -39,7 +39,7 @@ const ListadoProducto = () => {
                 <h3 className='text-lg font-bold'>Insumos</h3>
                 <div className='container ml-64'>
                         <Link
-                            className="bg-green hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg ml-80"
+                            className="bg-green hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg ml-72"
                             to="/agregar"
                         >
                             Agregar Insumo
