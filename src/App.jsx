@@ -8,23 +8,29 @@ import LoginForm from "./components/LoginForm/LoginForm";
 import Cultivo from "./components/cultivo/Cultivo";
 import Producto from "./components/producto/Producto";
 import Estadisticas from "./components/estadistica/Estadisticas";
+import Lotes from "./components/lotes/Lotes";
 
+// Usar import.meta.env en Vite para obtener los valores de Auth0
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
 const Layout = () => {
-
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth0();
 
+  // Mostrar pantalla de carga mientras Auth0 verifica la autenticación
   if (isLoading) {
-    return <div>Cargando...</div>
+
+    //todo(spinner) 
+    return <div>Cargando...</div>;
   }
 
+  // Si no está autenticado, mostrar el LoginForm
   if (!isAuthenticated) {
-    return <LoginForm />
+    return <LoginForm />;
   }
 
+  // Redirigir a /insumos si está autenticado y en la página de login
   if (location.pathname === "/") {
     return <Navigate to="/insumos" />;
   }
@@ -39,6 +45,7 @@ const Layout = () => {
         <Route path="/insumos" element={<ListadoProducto />} />
         <Route path="/agregar" element={<AgregarProducto />} />
         <Route path="/editar/:id" element={<EditarProducto />} />
+        <Route path="/lotes" element={<Lotes />}/>
         <Route path="/cultivo" element={<Cultivo />} />
         <Route path="/producto" element={<Producto />} />
         <Route path="/estadistica" element={<Estadisticas />} />
@@ -53,7 +60,7 @@ function App() {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin,
       }}
     >
       <BrowserRouter>
