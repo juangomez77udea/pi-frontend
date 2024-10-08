@@ -51,6 +51,7 @@ const AgregarProducto = () => {
                             value={name}
                             onChange={onInputChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder='Nombre del producto'
                         />
                     </div>
                     <div className="mb-4">
@@ -72,8 +73,9 @@ const AgregarProducto = () => {
                             value={type}
                             onChange={onInputChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            
                         >
-                            <option></option>
+                            <option className=' placeholder-opacity-70'>Seleccione una Categoría</option>
                             <option>Alimento</option>
                             <option>Medicamento</option>
                             <option>Insumo</option>
@@ -88,6 +90,7 @@ const AgregarProducto = () => {
                             value={presentation}
                             onChange={onInputChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder='Ingrese el peso por unidad de el/los insumos'
                         />
                     </div>
                     <div className="mb-4">
@@ -99,6 +102,7 @@ const AgregarProducto = () => {
                             value={quantity}
                             onChange={onInputChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder='Ingrese la cantidad'
                         />
                     </div>
                     <div className="mb-4">
@@ -111,6 +115,7 @@ const AgregarProducto = () => {
                             value={price}
                             onChange={onInputChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder='Ingrese el valor unitario'
                         />
                     </div>
 
