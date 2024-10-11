@@ -101,7 +101,7 @@ const Lotes = () => {
     return (
         <div className='flex flex-col items-center justify-center h-screen p-2 mt-10 overflow-hidden text-sm'>
             <h1 className=" text-3xl font-bold mb-8 text-center">Lotes</h1>
-            <form onSubmit={onSubmit} className="space-y-5 bg-perl shadow p-10 rounded-lg">
+            <form onSubmit={onSubmit} className="space-y-5 shadow p-10 rounded-lg">
                 <div className="grid grid-cols-2 gap-3">
                     <label htmlFor="idBatch" className="font-bold">Número de Lote:</label>
                     <p className="border border-slate-400 p-2 rounded-lg bg-gray-100">
