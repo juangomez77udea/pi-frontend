@@ -150,7 +150,7 @@ const Lotes = () => {
                 <div className="grid grid-cols-2 space-x-2">
                     <button
                         type="submit"
-                        className="bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg">
+                        className=" p-2 bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg">
                         {selectedBatch ? 'Editar Lote' : 'Agregar Lote'}
                     </button>
                     <button
