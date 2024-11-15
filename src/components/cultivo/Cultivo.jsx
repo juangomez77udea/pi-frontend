@@ -6,62 +6,96 @@ const Cultivo = () => {
   const [selectedBatch, setSelectedBatch] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [batchAge, setBatchAge] = useState('');
-  const [tankType, setTankType] = useState(''); // Tipo de estanque
+  const [tankType, setTankType] = useState('');
   const [quantityIn, setQuantityIn] = useState(0);
   const [quantityOut, setQuantityOut] = useState(0);
   const [averageWeightUnit, setAverageWeightUnit] = useState(0);
   const [averageWeightBatch, setAverageWeightBatch] = useState(0);
-
   const [pounds, setPounds] = useState([]);
   const [selectedPoundId, setSelectedPoundId] = useState('');
+  const [error, setError] = useState('');
+  const [selectedTankNumber, setSelectedTankNumber] = useState('');
+  
+  useEffect(() => {
+    if (quantityIn > 0 && averageWeightUnit > 0) {
+      const calculatedAverageWeightBatch = averageWeightUnit * quantityIn;
+      setAverageWeightBatch(calculatedAverageWeightBatch);
+    }
+  }, [quantityIn, averageWeightUnit]);
 
-  // Función para calcular la edad del lote en días
+  const getTankNumbers = () => {
+    switch (tankType) {
+      case 'Alevinaje':
+        return ['A1', 'A2', 'A3', 'A4'];
+      case 'Dedinos':
+        return ['D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12'];
+      case 'Levante':
+        return ['L13', 'L14', 'L15', 'L16', 'L17', 'L18', 'L19', 'L20', 'L21', 'L22'];
+      case 'Engorde':
+        return ['E23', 'E24', 'E25', 'E26', 'E27', 'E28', 'E29', 'E30', 'E31', 'E32'];
+      default:
+        return [];
+    }
+  };
+
   const calculateBatchAge = (dateIn) => {
     const currentDate = new Date();
     const loteDate = new Date(dateIn);
     const diffTime = Math.abs(currentDate - loteDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
 
-  // Función para obtener los lotes desde el backend
   const fetchBatches = () => {
+    setError('');
     fetch('http://localhost:8080/fg-app/lotes')
-      .then(response => response.json())
-      .then(data => {
-        setBatches(data);
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al obtener los lotes');
+        }
+        return response.json();
       })
+      .then(data => setBatches(data))
       .catch(error => {
         console.error('Error al obtener los lotes:', error);
+        setError('Error al obtener los lotes. Por favor, inténtelo nuevamente.');
       });
   };
 
-  // Función para obtener los estanques desde el backend
   const fetchPounds = () => {
+    setError('');
     fetch('http://localhost:8080/fg-app/estanques')
-      .then(response => response.json())
-      .then(data => {
-        setPounds(data);
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al obtener los estanques');
+        }
+        return response.json();
       })
+      .then(data => setPounds(data))
       .catch(error => {
         console.error('Error al obtener los estanques:', error);
+        setError('Error al obtener los estanques. Por favor, inténtelo nuevamente.');
       });
   };
 
-  // Obtener los lotes y estanques al montar el componente
   useEffect(() => {
     fetchBatches();
     fetchPounds();
   }, []);
 
-  // Manejar el cambio de lote seleccionado
   const handleBatchChange = (e) => {
     const batchId = e.target.value;
     setSelectedBatch(batchId);
     const batch = batches.find(b => b.idBatch === parseInt(batchId));
+  
     if (batch) {
-      setSelectedDate(batch.dateIn);
-      const age = calculateBatchAge(batch.dateIn);
+      const dateIn = new Date(batch.dateIn);
+      const adjustedDate = new Date(dateIn.getTime() - dateIn.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split('T')[0];
+      
+      setSelectedDate(adjustedDate);
+      const age = calculateBatchAge(adjustedDate);
       setBatchAge(age);
     } else {
       setSelectedDate('');
@@ -69,47 +103,47 @@ const Cultivo = () => {
     }
   };
 
-  // Restablecer el formulario después de guardar
   const resetForm = () => {
     setSelectedBatch('');
     setTankType('');
+    setBatchAge(0);
     setQuantityIn(0);
     setQuantityOut(0);
     setAverageWeightUnit(0);
     setAverageWeightBatch(0);
+    setSelectedTankNumber('');
   };
 
-  // Manejar el envío del formulario para agregar un estanque
   const handleSubmit = (e) => {
     e.preventDefault();
-  
-    if (!selectedBatch || !tankType || quantityIn <= 0) {
+
+    if (!selectedBatch || !tankType || !selectedTankNumber || quantityIn <= 0) {
       alert("Por favor, complete todos los campos obligatorios.");
       return;
     }
-  
-    // Validar que los valores sean numéricos
+
     const validQuantityIn = !isNaN(quantityIn) && quantityIn > 0;
     const validQuantityOut = !isNaN(quantityOut) && quantityOut >= 0;
     const validAverageWeightUnit = !isNaN(averageWeightUnit) && averageWeightUnit > 0;
-  
+
     if (!validQuantityIn || !validQuantityOut || !validAverageWeightUnit) {
       alert("Por favor, ingrese valores válidos en los campos numéricos.");
       return;
     }
-  
+
     const calculatedAverageWeightBatch = averageWeightUnit * quantityIn;
-  
+
     const poundData = {
-      idBatch: selectedBatch,
+      idBatch: parseInt(selectedBatch),
       datePound: new Date().toISOString().split('T')[0],
       poundType: tankType,
+      occupedPound: selectedTankNumber,
       quantityIn,
       quantityOut,
       averageWeightUnit,
       averageWeightBatch: calculatedAverageWeightBatch,
     };
-  
+
     fetch('http://localhost:8080/fg-app/estanques', {
       method: 'POST',
       headers: {
@@ -125,27 +159,22 @@ const Cultivo = () => {
       })
       .then(data => {
         console.log('Estanque guardado:', data);
-        if (data.idPound) {
-          console.log('ID generado:', data.idPound);  // Verifica si el ID fue generado
-        } else {
-          console.warn('ID no generado o nulo:', data);
-        }
-        // Restablecer el formulario y actualizar la lista de estanques
+        alert('Estanque guardado exitosamente');
         resetForm();
         fetchPounds();
       })
       .catch(error => {
         console.error('Error al guardar el estanque:', error);
+        alert('Error al guardar el estanque. Por favor, intente nuevamente.');
       });
   };
 
-  // Manejar la eliminación de un estanque seleccionado
   const handleDelete = () => {
     if (!selectedPoundId) {
       alert("Por favor, seleccione un estanque para eliminar.");
       return;
     }
-    
+
     if (!window.confirm("¿Está seguro de que desea eliminar este estanque?")) {
       return;
     }
@@ -156,7 +185,6 @@ const Cultivo = () => {
       .then(response => {
         if (response.ok) {
           alert("Estanque eliminado correctamente.");
-          // Actualizar la lista de estanques y limpiar la selección
           fetchPounds();
           setSelectedPoundId('');
         } else {
@@ -171,7 +199,8 @@ const Cultivo = () => {
 
   return (
     <div className='flex flex-col items-center justify-center h-screen p-2 mt-5 text-sm'>
-      <h1 className='text-3xl font-bold mb-8 text-center'>Estanques</h1>
+      <h1 className='text-3xl font-bold mt-32 text-center'>Estanques</h1>
+      {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSubmit} className='space-y-5 bg-white shadow p-6 rounded-lg w-full max-w-2xl'>
         <div className='grid grid-cols-2 gap-8'>
           <div className='flex items-center'>
@@ -214,6 +243,20 @@ const Cultivo = () => {
               <option value="Dedinos">Dedinos</option>
               <option value="Levante">Levante</option>
               <option value="Engorde">Engorde</option>
+            </select>
+          </div>
+
+          <div className='flex items-center'>
+            <label htmlFor="tankNumber" className='block text-sm font-medium text-gray-900 w-1/3'>Número de Estanque:</label>
+            <select
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-2/3"
+              value={selectedTankNumber}
+              onChange={(e) => setSelectedTankNumber(e.target.value)}
+            >
+              <option value="">Seleccione un número</option>
+              {getTankNumbers().map(tankNumber => (
+                <option key={tankNumber} value={tankNumber}>{tankNumber}</option>
+              ))}
             </select>
           </div>
 
@@ -272,11 +315,10 @@ const Cultivo = () => {
               name="averageWeightBatch"
               type="number"
               className="border border-slate-400 p-2.5 rounded-lg w-2/3"
-              value={averageWeightBatch} // Este campo puede ser solo de lectura o eliminarse
+              value={averageWeightBatch}
               readOnly
             />
           </div>
-
         </div>
         <div className='mt-6 grid grid-cols-2 space-x-2'>
           <button
@@ -294,11 +336,13 @@ const Cultivo = () => {
           </button>
         </div>
       </form>
+
       <div>
         <PoundTable
           pounds={pounds}
           selectedPoundId={selectedPoundId}
           onSelectPound={setSelectedPoundId}
+          selectedTankNumber={selectedTankNumber}
         />
       </div>
     </div>

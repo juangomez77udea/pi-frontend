@@ -35,9 +35,9 @@ const ListadoProducto = () => {
     return (
         <div className='flex items-center justify-center h-screen p-8 mt-10 overflow-hidden text-sm'>
             <div className='container mx-72 my-72 text-sm'>
-                <div className='text-center mb-6 grid grid-cols-2'>
-                    <h3 className='text-lg font-bold'>Insumos</h3>
-                    <div className='container ml-60'>
+                <div className='text-center mb-6 grid grid-cols-1'>
+                    <h3 className='text-3xl font-bold mt-10 text-center'>Insumos</h3>
+                    <div className=' container ml-96'>
                         <Link
                             className=" bg-blue_light hover:bg-blue_dark text-white font-bold py-2 px-2 rounded-lg"
                             to="/agregar"

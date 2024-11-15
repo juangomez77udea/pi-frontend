@@ -15,6 +15,8 @@ const Lotes = () => {
     const [batch, setBatch] = useState([]);
     const [selectedBatch, setSelectedBatch] = useState(null);
 
+    const [isFormValid, setIsFormValid] = useState(false);
+
     function getDate() {
         const today = new Date();
         const year = today.getFullYear();
@@ -27,11 +29,19 @@ const Lotes = () => {
         cargarLotes();
     }, []);
 
+    useEffect(() => {
+        const isValid =
+            lote.amount !== '' &&
+            lote.dateIn !== '' &&
+            lote.batchAge !== '';
+        setIsFormValid(isValid);
+    }, [lote]);
+
     const cargarLotes = async () => {
         const resultado = await axios.get(urlBase);
         setBatch(resultado.data);
 
-    
+
         if (resultado.data.length > 0) {
             const ultimoLote = Math.max(...resultado.data.map(lote => lote.idBatch));
             setLote((prevLote) => ({
@@ -119,6 +129,7 @@ const Lotes = () => {
                         placeholder="Ingrese la cantidad de animales"
                         value={lote.amount}
                         onChange={onInputChange}
+                        required
                     />
                 </div>
 
@@ -131,6 +142,7 @@ const Lotes = () => {
                         className="border border-slate-400 p-2 rounded-lg"
                         value={lote.dateIn}
                         onChange={onInputChange}
+                        required
                     />
                 </div>
 
@@ -144,14 +156,19 @@ const Lotes = () => {
                         placeholder="Ingrese la edad del lote"
                         value={lote.batchAge}
                         onChange={onInputChange}
+                        required
                     />
                 </div>
 
                 <div className="grid grid-cols-2 space-x-2">
                     <button
                         type="submit"
-                        className=" p-2 bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg">
+                        className=" p-2 bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg"
+                        disabled={!isFormValid}
+                    >
+                        
                         {selectedBatch ? 'Editar Lote' : 'Agregar Lote'}
+                    
                     </button>
                     <button
                         type="button"
