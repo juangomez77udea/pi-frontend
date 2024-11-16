@@ -12,7 +12,6 @@ const Cultivo = () => {
   const [averageWeightUnit, setAverageWeightUnit] = useState(0);
   const [averageWeightBatch, setAverageWeightBatch] = useState(0);
   const [pounds, setPounds] = useState([]);
-  const [selectedPoundId, setSelectedPoundId] = useState('');
   const [error, setError] = useState('');
   const [selectedTankNumber, setSelectedTankNumber] = useState('');
   
@@ -169,37 +168,9 @@ const Cultivo = () => {
       });
   };
 
-  const handleDelete = () => {
-    if (!selectedPoundId) {
-      alert("Por favor, seleccione un estanque para eliminar.");
-      return;
-    }
-
-    if (!window.confirm("¿Está seguro de que desea eliminar este estanque?")) {
-      return;
-    }
-
-    fetch(`http://localhost:8080/fg-app/estanques/${selectedPoundId}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (response.ok) {
-          alert("Estanque eliminado correctamente.");
-          fetchPounds();
-          setSelectedPoundId('');
-        } else {
-          throw new Error('Error al eliminar el estanque.');
-        }
-      })
-      .catch(error => {
-        console.error('Error al eliminar el estanque:', error);
-        alert("Error al eliminar el estanque.");
-      });
-  };
-
   return (
     <div className='flex flex-col items-center justify-center h-screen p-2 mt-5 text-sm'>
-      <h1 className='text-3xl font-bold mt-32 text-center'>Estanques</h1>
+      <h1 className='text-3xl font-bold mt-40 text-center'>Estanques</h1>
       {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSubmit} className='space-y-5 bg-white shadow p-6 rounded-lg w-full max-w-2xl'>
         <div className='grid grid-cols-2 gap-8'>
@@ -320,29 +291,21 @@ const Cultivo = () => {
             />
           </div>
         </div>
-        <div className='mt-6 grid grid-cols-2 space-x-2'>
+        <div className='mt-6'>
           <button
             type='submit'
-            className='p-2 bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg'
+            className='p-2 bg-blue_light hover:bg-blue_dark font-bold uppercase text-white rounded-lg w-full'
           >
             Guardar Estanque
-          </button>
-          <button
-            type='button'
-            onClick={handleDelete}
-            className='bg-red-500 hover:bg-red-600 font-bold uppercase text-white rounded-lg'
-          >
-            Eliminar Estanque
           </button>
         </div>
       </form>
 
-      <div>
+      <div className="w-full max-w-4xl mt-8 mb-28">
         <PoundTable
           pounds={pounds}
-          selectedPoundId={selectedPoundId}
-          onSelectPound={setSelectedPoundId}
-          selectedTankNumber={selectedTankNumber}
+          onPoundsChange={setPounds}
+          fetchPounds={fetchPounds}
         />
       </div>
     </div>
