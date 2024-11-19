@@ -1,43 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Chart as ChartJS,
-  LineElement,
-  PointElement,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
+  Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
-  LineElement,
-  PointElement,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
+  Title,
   Tooltip,
   Legend
 );
 
-
-
 const Estadisticas = () => {
+  const [dataType, setDataType] = useState('mortality');
+  const [timeFrame, setTimeFrame] = useState('week');
+  const [chartData, setChartData] = useState(null);
 
-  const data = {
-    labels: ['01', '02', '03', '04', '05', '06', '07','08', '09', '10', '11', '12','13', '14', '15',
-       '16', '17','18', '19', '20', '21', '22','23', '24', '25', '26', '27','28', '29', '30', '31'],
-    datasets: [{
-      label: 'Weekdays',
-      data: [90, 182, 182, 127, 180, 79, 92, 130, 178, 164, 76, 188, 148, 197, 142, 78, 75, 129, 88, 115, 148, 105, 91, 169, 189, 179, 102, 95, 191, 165],
-      borderColor: 'rgb(75, 192, 192)',
-      backgroundColor: 'rgba(75, 192, 192, 0.1)',
-      pointBackgroundColor: 'rgb(75, 192, 192)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgb(75, 192, 192)',
-      tension: 0.5,
-      fill: true,
-    }]
+  useEffect(() => {
+    fetchData();
+  }, [dataType, timeFrame]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/fg-app/registros/${dataType}/${timeFrame}`);
+      setChartData(processData(response.data));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const processData = (rawData) => {
+    return {
+      labels: rawData.labels,
+      datasets: [
+        {
+          label: dataType === 'mortality' ? 'Mortalidad' : 'Consumo de Alimentos',
+          data: rawData.values,
+          borderColor: dataType === 'mortality' ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)',
+          backgroundColor: dataType === 'mortality' ? 'rgba(255, 99, 132, 0.5)' : 'rgba(75, 192, 192, 0.5)',
+        },
+      ],
+    };
   };
 
   const options = {
@@ -48,32 +62,44 @@ const Estadisticas = () => {
       },
       title: {
         display: true,
-        text: 'Weekday Activity Chart',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
-        },
-      },
-      x: {
-        grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
-        },
+        text: `${dataType === 'mortality' ? 'Mortalidad' : 'Consumo de Alimentos'} - ${timeFrame === 'week' ? 'Última Semana' : 'Este Mes'}`,
       },
     },
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-center">Weekday Activity</h2>
-      <div style={{ aspectRatio: '16/9', width: '100%' }}>
-        <Line data={data} options={options} />
+    <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Estadísticas</h2>
+      
+      <div className="mb-6 flex justify-center space-x-4">
+        <select 
+          value={dataType} 
+          onChange={(e) => setDataType(e.target.value)}
+          className="p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="mortality">Mortalidad</option>
+          <option value="feedingAmount">Consumo de Alimentos</option>
+        </select>
+        
+        <select 
+          value={timeFrame} 
+          onChange={(e) => setTimeFrame(e.target.value)}
+          className="p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="week">Última Semana</option>
+          <option value="month">Este Mes</option>
+        </select>
       </div>
-    </div>
-  )
-}
 
-export default Estadisticas
+      {chartData ? (
+        <div className="aspect-w-16 aspect-h-9">
+          <Line options={options} data={chartData} />
+        </div>
+      ) : (
+        <p className="text-center text-gray-600">Cargando datos...</p>
+      )}
+    </div>
+  );
+};
+
+export default Estadisticas;
